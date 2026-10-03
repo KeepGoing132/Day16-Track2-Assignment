@@ -1,49 +1,54 @@
-# Báo Cáo Kết Quả Thực Nghiệm Lab 16 — Huấn Luyện & Đo Lường Mô Hình ML Trên AWS
+# Báo cáo Lab 16 — Cloud AI Environment Setup
 
-## 1. Thông tin cấu hình thực nghiệm
-- **Hạ tầng Cloud**: AWS EC2 Private Compute Node (`t3.micro`, 1 vCPU, 1 GiB RAM ~ 914 MiB khả dụng trên Linux + 1 GiB Swap) nằm trong Private Subnet của VPC cách ly (`AI-VPC`), trung chuyển an toàn qua Bastion Host (`t3.micro`) tại Public Subnet.
-- **Khu vực triển khai (AWS Region)**: `ap-southeast-2` (Sydney).  
-  *Ghi chú xác minh cấu hình*: Mặc dù đề cương bài lab mẫu ban đầu đề xuất `us-east-1` và `t3.medium`, tài khoản phòng lab thuộc AWS Organization áp dụng chính sách SCP (`p-7pylswvc`) chặn khởi tạo tài nguyên ngoài vùng `ap-southeast-2` (báo lỗi `UnauthorizedOperation`), đồng thời áp dụng chính sách hạn chế loại máy chủ ngoài Free Tier (báo lỗi `InvalidParameterCombination` khi khởi tạo `t3.medium`). Do đó, thực nghiệm được cấu hình chuẩn xác và thực thi thành công trên `t3.micro` tại `ap-southeast-2`.
-- **Hệ điều hành & Môi trường**: Ubuntu Linux 22.04 LTS (Kernel `6.8.0-1066-aws`, x86_64), Python 3.10.12, LightGBM 4.7.0, Scikit-learn 1.7.2, Pandas 2.3.3, NumPy 2.2.6.
-- **Tập dữ liệu**: Bộ dữ liệu thực tế **Credit Card Fraud Detection** từ Kaggle (`creditcard.csv`, kích thước 150.8 MB).
-  - Tổng số bản ghi: **284,807 dòng**, 31 cột (Time, V1–V28 PCA, Amount, Class).
-  - Phân bố nhãn: 284,315 giao dịch hợp lệ (99.827%) và 492 giao dịch gian lận (0.173%).
-  - Tập huấn luyện (Train set - 80% stratify): **227,845 mẫu**
-  - Tập kiểm thử (Test set - 20% stratify): **56,962 mẫu**
+## Cấu hình và nguồn kết quả
 
----
+Kết quả dưới đây được đối chiếu từ `benchmark_result.json` và hai file log có sẵn trong thư mục bài, ghi nhận lần chạy lúc **18:39:10 ngày 03/10/2026, giờ Việt Nam (UTC+7)**. Phiên rà soát này không chạy lại benchmark trên EC2.
 
-## 2. Bảng tổng hợp số liệu Benchmark thực tế (Khớp với `benchmark_result.json`)
+Theo báo cáo cũ và cấu hình Terraform, bài sử dụng AWS tại `ap-southeast-2`, compute node `t3.micro`, Ubuntu 22.04. Loại máy `t3.micro` có **2 vCPU và 1 GiB RAM** theo [tài liệu AWS](https://aws.amazon.com/ec2/instance-types/t3/). Log ghi nhận 914 MiB RAM khả dụng và 1 GiB swap. Compute node nằm trong private subnet, truy cập qua bastion, tải dữ liệu qua NAT Gateway; hạ tầng có ALB. GPU là phần tùy chọn và không được dùng trong bộ kết quả này.
 
-| Chỉ số (Metric) | Kết quả đo được | Đánh giá kỹ thuật |
-| :--- | :--- | :--- |
-| **Thời gian nạp dữ liệu (Load data)** | `2.5745 s` | Nạp và parse 284,807 dòng CSV từ ổ đĩa gp3 EBS vào bộ nhớ RAM |
-| **Thời gian huấn luyện (Training time)** | `1.8747 s` | LightGBM tối ưu thuật toán Histogram song song trên CPU |
-| **Số vòng lặp tối ưu (Best iteration)** | `1` | Early stopping kích hoạt do phân bố PCA phân tách lớp rất mạnh ngay cây đầu tiên |
-| **AUC-ROC** | `0.95165` | Khả năng phân loại và tách biệt gian lận đạt mức xuất sắc (> 0.95) |
-| **Độ chính xác (Accuracy)** | `0.99895` (99.89%) | Phản ánh tính chất tập dữ liệu có độ mất cân bằng lớp cực cao |
-| **F1-Score** | `0.72727` | Điểm hài hòa giữa Precision và Recall trên bài toán gian lận thực tế |
-| **Precision** | `0.65574` | Tỷ lệ dự báo đúng gian lận trong số các ca bị gắn cờ cảnh báo |
-| **Recall** | `0.81633` | Phát hiện thành công hơn 81.6% tổng số các ca gian lận trong tập test |
-| **Độ trễ suy luận đơn dòng (Single Latency)** | `1.236 ms` | Thời gian xử lý trung bình qua 200 lượt suy luận 1 giao dịch |
-| **Thông lượng suy luận (Batch Throughput)** | `650,534 rows/s` | Gom batch 1,000 mẫu chỉ mất `1.54 ms` để xử lý xong toàn bộ |
+Báo cáo cũ giải thích việc thay `us-east-1`/`t3.medium` bằng `ap-southeast-2`/`t3.micro` là do hạn chế SCP và Free Tier của tài khoản. Các lỗi và policy tương ứng chưa có log đính kèm để xác minh độc lập, nên đây là thông tin từ báo cáo cũ.
 
----
+Dữ liệu `creditcard.csv` được rà soát trực tiếp: **284.807 dòng, 31 cột**, gồm 284.315 mẫu hợp lệ và 492 mẫu gian lận (**0,173%**), không có ô thiếu. File JSON ghi rõ `is_synthetic: false`. Chia train/test 80%/20%, stratify theo `Class`, seed 42: 227.845 / 56.962 mẫu.
 
-## 3. Báo cáo nhận xét ngắn (5 - 10 dòng theo tiêu chí nộp bài)
+## Kết quả benchmark đã lưu
 
-1. **Về hiệu năng nạp dữ liệu và huấn luyện (Load & Training Time)**: Trên cấu hình máy chủ CPU tiết kiệm `t3.micro` (1 vCPU, 914 MiB RAM khả dụng), thời gian nạp bộ dữ liệu thực tế gần 285,000 dòng chỉ mất 2.57 giây và thời gian huấn luyện chỉ 1.87 giây, chứng tỏ LightGBM có cấu trúc dữ liệu nén Histogram cực kỳ nhẹ và tối ưu hóa vượt trội cho dữ liệu dạng bảng mà không đòi hỏi GPU đắt đỏ.
-2. **Về chất lượng mô hình (AUC-ROC & Recall)**: Với tập dữ liệu thực có mức độ mất cân bằng nghiêm trọng (chỉ 0.173% gian lận), mô hình đạt diện tích dưới đường cong ROC xuất sắc (`AUC = 0.95165`) và độ nhạy `Recall = 81.63%`, giúp nhận diện phần lớn các hành vi lừa đảo mà vẫn duy trì độ chính xác tổng thể 99.89%.
-3. **Về tốc độ suy luận (Inference Latency & Throughput)**: Tốc độ chấm điểm đơn dòng đạt trung bình `1.236 ms` và thông lượng xử lý theo lô đạt hơn `650,000 dòng/giây` (1.54 ms cho 1,000 giao dịch). Mức thời gian đáp ứng ở tầng thuật toán này nằm trong ngưỡng khả thi cho các hệ thống chấm điểm gian lận trực tuyến (thường yêu cầu xử lý tổng thể dưới 50–100 ms), tuy nhiên khi triển khai production thực tế cần tính toán thêm độ trễ truyền gói tin mạng (network round-trip) và cơ chế xác thực bảo mật.
-4. **Về mức độ tiêu thụ tài nguyên phần cứng**: Dữ liệu giám sát thời gian thực qua lệnh `top` và `free -h` cho thấy tiến trình chỉ chiếm khoảng `205 MiB` RAM trên tổng số `914 MiB` bộ nhớ vật lý khả dụng (swap chỉ sử dụng 4 MiB), bộ nhớ đệm cache được giải phóng an toàn sau khi chạy, khẳng định kiến trúc hoàn toàn khả thi và vận hành ổn định trên các instance nhỏ nhất.
-5. **Về an toàn hạ tầng và quản lý chi phí**: Toàn bộ luồng tính toán được cô lập trong Private Subnet sau Bastion Host và NAT Gateway. Sau khi thu thập đầy đủ minh chứng thực nghiệm, lệnh dọn dẹp `terraform destroy` được thực thi để hủy toàn bộ tài nguyên (EC2, VPC, NAT Gateway, ALB), đảm bảo chi phí phát sinh trong phiên thực hành ngắn duy trì ở mức tối thiểu (ước tính dưới $0.05 - $0.10 theo đơn giá On-Demand).
+| Chỉ số | Kết quả |
+|---|---:|
+| Thời gian nạp dữ liệu | 2.5745 s |
+| Thời gian huấn luyện | 1.8747 s |
+| Best iteration | 1 |
+| AUC-ROC | 0.95165 |
+| Accuracy | 0.99895 |
+| F1-Score | 0.72727 |
+| Precision | 0.65574 |
+| Recall | 0.81633 |
+| Latency một dòng, trung bình 200 lượt | 1.2365 ms |
+| Throughput lô 1.000 dòng, trung bình 20 lượt | 650,534.16 dòng/s |
+| Thời gian lô 1.000 dòng | 1.54 ms |
 
----
+## Nhận xét ngắn
 
-## 4. Danh sách tệp nộp bài đính kèm
-- `screenshot_benchmark.png`: Ảnh chụp màn hình terminal chạy `python3 benchmark.py` với tập dữ liệu Kaggle thực tế.
-- `benchmark_result.json`: File metrics kết quả benchmark chính thức tải về từ máy chủ AWS EC2 (`is_synthetic: false`).
-- `screenshot_resources.png`: Ảnh chụp màn hình terminal kiểm tra tài nguyên thực tế (`top`, `free -h`, `ip -s link`).
-- `screenshot_billing.png`: Ảnh chụp màn hình giao diện AWS Billing / Cost Management Dashboard.
-- `terraform.zip`: Toàn bộ mã nguồn Terraform triển khai hạ tầng.
-- `report.md`: Báo cáo kết quả thực nghiệm chi tiết này.
+1. Log đã lưu ghi nhận nạp gần 285.000 giao dịch trong 2,5745 giây và huấn luyện trong 1,8747 giây trên CPU.
+2. AUC-ROC 0,95165 cho thấy khả năng xếp hạng phân biệt hai lớp tốt trong phép đánh giá này; Recall 0,81633 phản ánh tỷ lệ phát hiện mẫu gian lận.
+3. Accuracy 0,99895 cần đọc cùng F1 0,72727 và Precision 0,65574 vì dữ liệu rất mất cân bằng; dự đoán toàn bộ là hợp lệ cũng đạt khoảng 99,827% accuracy.
+4. Best iteration = 1 là vòng có metric validation tốt nhất theo cơ chế early stopping; số này không cho biết tổng số cây đã thử, cũng không chứng minh PCA tách lớp hoàn hảo ngay cây đầu tiên.
+5. Latency trung bình một dòng là 1,2365 ms; throughput lô 1.000 dòng khoảng 650.534 dòng/s. Đây là thời gian gọi mô hình, chưa tính mạng hay tầng API.
+6. Log tài nguyên sau benchmark ghi nhận CPU idle 100%, RAM toàn hệ thống dùng 205,1 MiB và swap dùng 4 MiB; đây không phải RAM đỉnh hoặc RAM riêng của tiến trình huấn luyện.
+7. Mã hiện dùng tập test làm `eval_set` để chọn best iteration, nên metric này chưa đến từ tập test độc lập với bước chọn mô hình. Lần đánh giá cải tiến cần train/validation/test riêng.
+8. State Terraform hiện có 0 tài nguyên. Kiểm tra AWS chỉ đọc lúc 19:11:23 ngày 03/10/2026 (UTC+7) xác nhận không còn EC2 chưa kết thúc, EBS volume/snapshot do tài khoản sở hữu, Elastic IP hoặc Load Balancer tại `ap-southeast-2`; NAT của bài đã `deleted` và không còn VPC `AI-VPC`. Ảnh Billing hiện có vẫn chưa thể hiện chi phí theo dịch vụ.
+
+## Giới hạn minh chứng và việc còn thiếu
+
+- Hai ảnh terminal và log được giữ nguyên từ bộ bài có sẵn. Phiên rà soát kiểm tra tính nhất quán nội dung nhưng chưa xác minh nguồn gốc ảnh terminal là ảnh chụp trực tiếp.
+- `screenshot_billing.png` đã được thay bằng ảnh Cost Explorer do người dùng cung cấp: khoảng ngày 01–03/10/2026, Granularity = Daily, Group by = Service, Applied filters = 0. Tooltip ngày 03/10 hiển thị Costs = $0.00. Ảnh này ghi nhận đúng trang và cấu hình xem chi phí tại thời điểm chụp, nhưng chưa có phân rã số liệu cho EC2/NAT/ALB. Không dùng số này để khẳng định chi phí sử dụng thực tế bằng 0.
+- Cost Explorer cập nhật dữ liệu chi phí ít nhất một lần mỗi 24 giờ; lần đầu mở có thể cần tới 24 giờ để dữ liệu xuất hiện. Chưa xác định nguyên nhân biểu đồ hiện chưa có chi phí. Nguồn: [AWS Cost Explorer](https://docs.aws.amazon.com/cost-management/latest/userguide/ce-enable.html), [AWS hướng dẫn phân tích chi phí](https://www.repost.aws/knowledge-center/cost-explorer-analyze-spending-and-usage).
+- Khi dữ liệu xuất hiện, có thể bổ sung ảnh thể hiện riêng EC2, NAT Gateway và ALB. Ảnh hiện tại được giữ làm minh chứng trạng thái Cost Explorer sau thực hành.
+- Đã kiểm tra trực tiếp tại `ap-southeast-2`: 0 EC2 chưa kết thúc, 0 EBS volume, 0 EBS snapshot do tài khoản sở hữu, 0 Elastic IP, 0 Load Balancer loại ALB/NLB/GWLB và Classic; NAT còn xuất hiện trong danh sách đã ở trạng thái `deleted`. Không còn VPC `AI-VPC`. Chưa kiểm tra dịch vụ khác hoặc vùng khác; kiểm tra này không xác định số tiền đã phát sinh trước khi dọn tài nguyên.
+
+## Tệp đính kèm
+
+`benchmark.py`, `benchmark_result.json`, hai file log terminal, ba ảnh hiện có, mã Terraform trong `terraform/` và `terraform.zip`, cùng `kiem_tra_bo_bai.md`.
+
+Gói nộp không chứa AWS Access Key, private SSH key, Terraform state/backup hoặc bộ provider tải về. CSV dữ liệu 150,8 MB được giữ ở thư mục gốc để tránh nén lại dữ liệu không được yêu cầu nộp.
+
+Nguồn giải thích early stopping: [LightGBM](https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.early_stopping.html).

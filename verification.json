@@ -1,0 +1,149 @@
+{
+  "dataset_validation": {
+    "rows": 284807,
+    "columns": [
+      "Time",
+      "V1",
+      "V2",
+      "V3",
+      "V4",
+      "V5",
+      "V6",
+      "V7",
+      "V8",
+      "V9",
+      "V10",
+      "V11",
+      "V12",
+      "V13",
+      "V14",
+      "V15",
+      "V16",
+      "V17",
+      "V18",
+      "V19",
+      "V20",
+      "V21",
+      "V22",
+      "V23",
+      "V24",
+      "V25",
+      "V26",
+      "V27",
+      "V28",
+      "Amount",
+      "Class"
+    ],
+    "class_counts": {
+      "0": 284315,
+      "1": 492
+    },
+    "missing_cells": 0,
+    "sha256": "76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89"
+  },
+  "local_terraform_resource_count": 0,
+  "aws_live_verification": {
+    "region": "ap-southeast-2",
+    "checked_at_utc": "2026-10-03T12:11:23.316392+00:00",
+    "instances": [
+      {
+        "state": "terminated",
+        "instance_type": "t3.micro"
+      },
+      {
+        "state": "terminated",
+        "instance_type": "t3.micro"
+      }
+    ],
+    "lab_vpc_count": 0,
+    "nat_states": [
+      "deleted"
+    ],
+    "status": "verified_read_only",
+    "regional_billable_resource_checks": {
+      "nonterminated_instances": {
+        "status": "verified_read_only",
+        "count": 0
+      },
+      "ebs_volumes": {
+        "status": "verified_read_only",
+        "count": 0
+      },
+      "elastic_ips": {
+        "status": "verified_read_only",
+        "count": 0
+      },
+      "owned_ebs_snapshots": {
+        "status": "verified_read_only",
+        "count": 0
+      },
+      "load_balancers": {
+        "status": "verified_read_only",
+        "count": 0
+      },
+      "classic_load_balancers": {
+        "status": "verified_read_only",
+        "count": 0
+      },
+      "nat_gateways": {
+        "status": "verified_read_only",
+        "count": 1,
+        "states": [
+          "deleted"
+        ],
+        "nondeleted_count": 0
+      }
+    }
+  },
+  "existing_metrics_preserved": {
+    "metadata": {
+      "timestamp": "2026-10-03 11:39:10 UTC",
+      "system": {
+        "os": "Linux",
+        "release": "6.8.0-1066-aws",
+        "architecture": "x86_64",
+        "processor": "x86_64",
+        "python_version": "3.10.12",
+        "lightgbm_version": "4.7.0"
+      },
+      "data_source": "/home/ubuntu/creditcard.csv",
+      "is_synthetic": false,
+      "total_rows": 284807,
+      "train_rows": 227845,
+      "test_rows": 56962
+    },
+    "metrics": {
+      "data_load_time_sec": 2.5745,
+      "training_time_sec": 1.8747,
+      "best_iteration": 1,
+      "auc_roc": 0.95165,
+      "accuracy": 0.99895,
+      "f1_score": 0.72727,
+      "precision": 0.65574,
+      "recall": 0.81633,
+      "inference_latency_single_row_ms": 1.2365,
+      "inference_throughput_1000_rows_sec": 650534.16,
+      "inference_batch_1000_time_ms": 1.54
+    }
+  },
+  "packaged_at_utc": "2026-10-03T12:23:33.664464+00:00",
+  "files_sha256": {
+    "benchmark.py": "dadf7d4b2d00006e99cc2a7bde48eb5189644ab95ca7b65536902e43ca7bce34",
+    "benchmark_result.json": "05a35ecda5e701aa61ea63e9cef0af020af496539ff9faaea794b5782f452734",
+    "kiem_tra_bo_bai.md": "c45f92deacc69b6dc20983e3df6f521e9bac22af7ea3099de5f971759b75eab9",
+    "report.md": "14485f118dbd6a2b5b100a0a5b1e718c0329dcad30634b43861c53b68f6130c2",
+    "screenshot_benchmark.png": "08f59ec7ab4f263a113497bfa030bce917ff56d24040c619a110dacafd11bac4",
+    "screenshot_billing.png": "c2275e49a1bf0499990a0bf91f88f9a0bb86c64bd6c57aee3726e0f49390d1b3",
+    "screenshot_resources.png": "2db829e1ca4b511523414e28bfc9e598b2c70d9dc805a5c2716b1d989cac3744",
+    "terminal_benchmark_output.txt": "1cc75ec94c1985caafcaa291e73fe33cd1161475786490dc456d3ab45f113f4e",
+    "terminal_resource_monitoring.txt": "626c122d511253ca7b9f2d2ca48b0c3eba78bf571ac4648b8d266c90e49bc8be",
+    "terraform.zip": "b1c13c6f0243896998d42d5fdcc12eb4af4fe8ae416bc920abb092ade5d39058",
+    "terraform\\.terraform.lock.hcl": "5a9cc989bf8a36473a864bcb3348b80135ac4d396d363df5eb65ca48f2d890da",
+    "terraform\\main.tf": "7e85c6aced9dc07ae1d2cc6b4c95b8bca129ac6835b5a310c9bff2ca7ad0bac6",
+    "terraform\\outputs.tf": "575e89180a36691ec6416bfa76c3bb734e9ed7e3724c35e25b533780e8a87c4f",
+    "terraform\\providers.tf": "8204fff10cee74392f5c3727344da36d900d72627bcdd47ba6eda30c4a39f1bc",
+    "terraform\\user_data_cpu.sh": "867bc2b38692e1aae7f18c56275fbf8e91a20c64334643a6e1dc73462055b8d0",
+    "terraform\\user_data_gpu.sh": "3979bb1cd3a89878e544f5180959fe79739baa5967fc91cedb035710e504c232",
+    "terraform\\variables.tf": "ecd91936e2c08b186e746f28b38d8f17533add2564d7cc373239804746416fed"
+  }
+}
