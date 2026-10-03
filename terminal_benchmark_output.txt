@@ -1,18 +1,14 @@
-ubuntu@ip-10-0-10-142:~$ python3 benchmark.py --generate-mock
+ubuntu@ip-10-0-10-155:~$ python3 /home/ubuntu/benchmark.py --data-path /home/ubuntu/creditcard.csv --output /home/ubuntu/benchmark_result.json
 
-[!] Dataset creditcard.csv not found in standard paths.
-    Using synthetic dataset for benchmark testing (--generate-mock enabled).
-
-[INFO] Generating synthetic dataset (284,807 rows, 30 features)...
-[INFO] Synthetic dataset generated: 284,807 records, 486 frauds (0.171%).
+[1/5] Loading real dataset from: /home/ubuntu/creditcard.csv
       Rows: 284,807, Columns: 31
-      Class distribution: {0: 284321, 1: 486}
-      Load time: 0.2857 s
+      Class distribution: {0: 284315, 1: 492}
+      Load time: 2.5745 s
 
 [2/5] Train set: 227,845 samples | Test set: 56,962 samples
 
 [3/5] Training LightGBM Classifier...
-      Training completed in 2.4248 s (Best iteration: 7)
+      Training completed in 1.8747 s (Best iteration: 1)
 
 [4/5] Evaluating model on test set...
 
@@ -25,29 +21,29 @@ ubuntu@ip-10-0-10-142:~$ python3 benchmark.py --generate-mock
 ======================================================================
 Metric                               | Ket qua / Value               
 ----------------------------------------------------------------------
-Thoi gian load data                  | 0.2857 s
-Thoi gian training                   | 2.4248 s
-Best iteration                       | 7
-AUC-ROC                              | 0.82986
-Accuracy                             | 0.99821 (99.82%)
-F1-Score                             | 0.48485
-Precision                            | 0.47525
-Recall                               | 0.49485
-Inference latency (1 row)            | 1.185 ms
-Inference throughput (1000 rows)     | 669,431 rows/s (1.49 ms)
+Thoi gian load data                  | 2.5745 s
+Thoi gian training                   | 1.8747 s
+Best iteration                       | 1
+AUC-ROC                              | 0.95165
+Accuracy                             | 0.99895 (99.89%)
+F1-Score                             | 0.72727
+Precision                            | 0.65574
+Recall                               | 0.81633
+Inference latency (1 row)            | 1.236 ms
+Inference throughput (1000 rows)     | 650,534 rows/s (1.54 ms)
 ======================================================================
 
 [+] Markdown Table for Lab Report:
 | Metric | Ket qua |
 |---|---|
-| Thoi gian load data | 0.2857 s |
-| Thoi gian training | 2.4248 s |
-| Best iteration | 7 |
-| AUC-ROC | 0.82986 |
-| Accuracy | 0.99821 |
-| F1-Score | 0.48485 |
-| Precision | 0.47525 |
-| Recall | 0.49485 |
-| Inference latency (1 row) | 1.185 ms |
-| Inference throughput (1000 rows) | 669,431 rows/s (1.49 ms) |
-ubuntu@ip-10-0-10-142:~$ 
+| Thoi gian load data | 2.5745 s |
+| Thoi gian training | 1.8747 s |
+| Best iteration | 1 |
+| AUC-ROC | 0.95165 |
+| Accuracy | 0.99895 |
+| F1-Score | 0.72727 |
+| Precision | 0.65574 |
+| Recall | 0.81633 |
+| Inference latency (1 row) | 1.236 ms |
+| Inference throughput (1000 rows) | 650,534 rows/s (1.54 ms) |
+ubuntu@ip-10-0-10-155:~$ 

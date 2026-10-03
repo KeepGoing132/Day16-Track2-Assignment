@@ -1,5 +1,5 @@
 variable "aws_region" {
-  description = "AWS Region"
+  description = "AWS Region (default is ap-southeast-2 to comply with lab IAM/SCP restrictions)"
   type        = string
   default     = "ap-southeast-2"
 }
@@ -24,7 +24,7 @@ variable "enable_gpu" {
 }
 
 variable "cpu_instance_type" {
-  description = "Instance type for the default CPU (LightGBM) compute node"
+  description = "Instance type for CPU compute node (t3.micro for Free-Tier policy compliance, or t3.medium if quota permits)"
   type        = string
   default     = "t3.micro"
 }

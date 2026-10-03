@@ -20,3 +20,8 @@ lab-key.pub
 # Environment Variables
 .env
 .env.local
+
+# Data and Cache
+*.csv
+__pycache__/
+*.pyc
