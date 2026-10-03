@@ -8,8 +8,6 @@ Tài liệu này dành cho các bạn **không có tài khoản AWS hoặc GCP**
 
 > **Khác biệt so với bản AWS/GCP:** Hai bản đó dùng **Terraform** (Infrastructure as Code) để bạn thực hành IaC. Ở đây, vì đây là tùy chọn thay thế, chúng ta dùng trực tiếp **CLI/Console** của từng cloud cho gọn nhẹ — không bắt buộc viết Terraform. Nếu bạn muốn thực hành thêm Terraform trên Azure/OCI, đó là điểm cộng nhưng không nằm trong yêu cầu của lab.
 
-> **Ghi chú nộp bài:** Bài thực hành này đã hoàn thành triển khai và nộp kết quả trên **AWS** (xem file [`report.md`](report.md), [`benchmark_result.json`](benchmark_result.json) và [`README_aws.md`](README_aws.md)). Tài liệu Azure / OCI dưới đây được cung cấp làm tài liệu hướng dẫn tham khảo bổ sung nếu sinh viên có nhu cầu mở rộng sang các nền tảng đám mây khác.
-
 Chọn một trong hai phần bên dưới tùy theo cloud bạn có tài khoản:
 - [Phần A: Microsoft Azure](#phần-a-microsoft-azure)
 - [Phần B: Oracle Cloud Infrastructure (OCI)](#phần-b-oracle-cloud-infrastructure-oci) — có gói **Always Free** đủ mạnh để chạy toàn bộ lab CPU với **chi phí $0**.

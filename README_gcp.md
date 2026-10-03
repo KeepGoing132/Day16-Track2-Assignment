@@ -148,20 +148,18 @@ Viết một script Python (ví dụ `benchmark.py`) thực hiện:
 
 Chạy script và điền kết quả vào bảng:
 
-> **Ghi chú nộp bài**: Bài thực hành này lựa chọn và hoàn thành triển khai thực tế trên **AWS** (xem chi tiết tại [`README_aws.md`](README_aws.md), kết quả [`benchmark_result.json`](benchmark_result.json) và [`report.md`](report.md)). Hướng dẫn GCP dưới đây được giữ nguyên làm tài liệu tham khảo kiến trúc đa đám mây (multi-cloud blueprint).
-
-| Metric | Kết quả mẫu (Tham khảo) |
+| Metric | Kết quả |
 |---|---|
-| Thời gian load data | *(Chạy trên AWS — xem report.md)* |
-| Thời gian training | *(Chạy trên AWS — xem report.md)* |
-| Best iteration | *(Chạy trên AWS — xem report.md)* |
-| AUC-ROC | *(Chạy trên AWS — xem report.md)* |
-| Accuracy | *(Chạy trên AWS — xem report.md)* |
-| F1-Score | *(Chạy trên AWS — xem report.md)* |
-| Precision | *(Chạy trên AWS — xem report.md)* |
-| Recall | *(Chạy trên AWS — xem report.md)* |
-| Inference latency (1 row) | *(Chạy trên AWS — xem report.md)* |
-| Inference throughput (1000 rows) | *(Chạy trên AWS — xem report.md)* |
+| Thời gian load data | |
+| Thời gian training | |
+| Best iteration | |
+| AUC-ROC | |
+| Accuracy | |
+| F1-Score | |
+| Precision | |
+| Recall | |
+| Inference latency (1 row) | |
+| Inference throughput (1000 rows) | |
 
 ---
 

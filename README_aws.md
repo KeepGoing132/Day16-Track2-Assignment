@@ -53,11 +53,8 @@ aws configure
 Nhập các thông tin:
 - **AWS Access Key ID**: (Dán Access key ID của bạn)
 - **AWS Secret Access Key**: (Dán Secret access key của bạn)
-- **Default region name**: `us-east-1` (hoặc `ap-southeast-2` nếu tài khoản phòng lab bị giới hạn SCP chỉ cho phép Sydney)
+- **Default region name**: `us-east-1` (Bắt buộc dùng us-east-1 cho lab này)
 - **Default output format**: `json`
-
-> **Lưu ý quan trọng về tài khoản phòng lab (SCP & Quota):**  
-> Nếu tài khoản AWS của bạn thuộc tổ chức có chính sách SCP (Service Control Policy) chặn `us-east-1` (báo lỗi `UnauthorizedOperation`) hoặc chính sách Free Tier chỉ cho phép instance `t3.micro` (báo lỗi `The specified instance type is not eligible for Free Tier` khi chọn `t3.medium`), hãy đặt biến trong Terraform thành `aws_region = "ap-southeast-2"` và `cpu_instance_type = "t3.micro"`. Mã nguồn trong thư mục `terraform/` của bài thực hành đã được cấu hình sẵn theo giá trị tương thích này.
 
 ### Bước 2.2: Tạo SSH Key Pair cho Terraform
 Terraform cần một public key có sẵn để tạo Key Pair trên AWS (dùng để SSH vào Bastion Host và Compute Node). Trong thư mục `terraform`, chạy:
@@ -76,7 +73,7 @@ Lệnh này tạo ra hai file: `lab-key` (private key, giữ bí mật) và `lab
 Terraform là công cụ giúp chúng ta khởi tạo hạ tầng AWS hoàn toàn tự động bằng code. Kiến trúc bao gồm:
 - Mạng **Private VPC** cách ly hoàn toàn với bên ngoài.
 - **Bastion Host** (t3.micro) ở Public Subnet: Dùng làm trạm trung chuyển an toàn để SSH vào Compute Node.
-- **Compute Node** (`t3.medium` — 2 vCPU / 4 GB RAM, hoặc `t3.micro` — 1 vCPU / 1 GB RAM nếu tài khoản chỉ áp dụng Free Tier) ở Private Subnet: Đây là nơi bạn sẽ cài đặt và chạy LightGBM. Instance này **mặc định là CPU**; hạ tầng đã được viết sẵn để chuyển sang GPU (`g4dn.xlarge`) nếu bạn làm Phụ lục ở cuối bài, thông qua biến `enable_gpu`.
+- **Compute Node** (`t3.medium` — 2 vCPU / 4 GB RAM) ở Private Subnet: Đây là nơi bạn sẽ cài đặt và chạy LightGBM. Instance này **mặc định là CPU**; hạ tầng đã được viết sẵn để chuyển sang GPU (`g4dn.xlarge`) nếu bạn làm Phụ lục ở cuối bài, thông qua biến `enable_gpu`.
 - **NAT Gateway**: Cho phép Private Subnet tải package/dataset từ internet.
 - **Application Load Balancer (ALB)**: Mở cổng 80 (HTTP), trỏ vào cổng 8000 của Compute Node. Ở luồng CPU mặc định sẽ chưa có gì lắng nghe cổng 8000 nên **health check của ALB sẽ hiển thị "unhealthy" — đây là điều bình thường**, bạn không cần xử lý gì cả trừ khi làm Phụ lục GPU + LLM.
 
@@ -112,36 +109,11 @@ gpu_private_ip = "10.0.1x.x"
 `gpu_private_ip` chính là IP private của Compute Node (CPU) bạn vừa tạo — tên biến giữ nguyên từ hạ tầng dùng chung với phần GPU tùy chọn. `endpoint_url`/`alb_dns_name` chỉ có ý nghĩa nếu bạn làm Phụ lục GPU + LLM ở cuối bài; ở luồng CPU bạn có thể bỏ qua hai giá trị này.
 
 ### Bước 4.1: SSH vào Compute Node qua Bastion Host
-
-Do Compute Node nằm trong Private Subnet không có IP public, bạn cần kết nối trung chuyển qua Bastion Host. Vì file private key `lab-key` nằm trên máy tính cá nhân của bạn, có 3 cách thực hiện kết nối an toàn:
-
-#### Cách 1: Sử dụng SSH ProxyJump (Khuyên dùng — nhanh nhất, không cần copy key lên máy chủ)
-Từ máy cá nhân (nơi chứa file `lab-key`), mở terminal và gõ trực tiếp:
 ```bash
-ssh -i lab-key -J ubuntu@<BASTION_PUBLIC_IP> ubuntu@<CPU_PRIVATE_IP>
-```
-*(Nếu phiên bản OpenSSH cũ chưa hỗ trợ `-J`, sử dụng: `ssh -i lab-key -o "ProxyCommand=ssh -i lab-key -W %h:%p ubuntu@<BASTION_PUBLIC_IP>" ubuntu@<CPU_PRIVATE_IP>`)*
-
-#### Cách 2: Sao chép Private Key lên Bastion Host
-Nếu bạn muốn đăng nhập vào Bastion Host trước rồi mới SSH tiếp sang Compute Node:
-1. Sao chép `lab-key` từ máy cá nhân lên Bastion Host:
-```bash
-scp -i lab-key lab-key ubuntu@<BASTION_PUBLIC_IP>:~/.ssh/id_rsa
-```
-2. Đăng nhập vào Bastion Host và thiết lập quyền truy cập cho file key (600):
-```bash
+# SSH vào Bastion Host
 ssh -i lab-key ubuntu@<BASTION_PUBLIC_IP>
-chmod 600 ~/.ssh/id_rsa
-```
-3. Từ Bastion Host, kết nối trực tiếp tới Compute Node:
-```bash
-ssh ubuntu@<CPU_PRIVATE_IP>
-```
 
-#### Cách 3: Sử dụng SSH Agent Forwarding
-```bash
-ssh-add lab-key
-ssh -A ubuntu@<BASTION_PUBLIC_IP>
+# Từ Bastion, SSH vào Compute Node (dùng IP private ở trên)
 ssh ubuntu@<CPU_PRIVATE_IP>
 ```
 
