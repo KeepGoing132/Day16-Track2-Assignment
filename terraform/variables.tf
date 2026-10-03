@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS Region"
   type        = string
-  default     = "us-east-1"
+  default     = "ap-southeast-2"
 }
 
 variable "hf_token" {
@@ -26,7 +26,7 @@ variable "enable_gpu" {
 variable "cpu_instance_type" {
   description = "Instance type for the default CPU (LightGBM) compute node"
   type        = string
-  default     = "t3.medium"
+  default     = "t3.micro"
 }
 
 variable "gpu_instance_type" {
